@@ -1,135 +1,144 @@
 @echo off
-chcp 65001 >nul 2>&1
+chcp 949 >nul
 setlocal EnableDelayedExpansion
-title Vercel CLI - Uninstaller
+title Vercel CLI - 제거 (Uninstaller)
 
 REM ================================================================
-REM   Vercel CLI - Safe Uninstaller
-REM   Removes Vercel CLI and cleans up config files
-REM   Encoding: UTF-8 No BOM, CRLF
+REM   Vercel CLI - 안전 제거 / Safe Uninstaller
+REM   Vercel CLI 제거 + 설정 파일 정리 / Removes CLI and cleans config
+REM   인코딩: CP949 (한글) + CRLF, chcp 949
+REM   ** 관리자 권한 필요 없음 / No admin needed **
+REM   ** 내가 만든 코드/파일은 지우지 않습니다 / Your own files are kept **
 REM ================================================================
 
 set "SCRIPT_DIR=%~dp0"
 set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 cd /d "%SCRIPT_DIR%"
 
-REM === Add npm global bin to PATH ===
+REM === npm 전역 폴더를 PATH에 / Add npm global bin to PATH ===
 set "NPM_PREFIX="
 for /f "tokens=*" %%p in ('npm config get prefix 2^>nul') do set "NPM_PREFIX=%%p"
 if not "!NPM_PREFIX!"=="" set "PATH=!NPM_PREFIX!;!PATH!"
 
 echo.
 echo ============================================================
-echo   Vercel CLI - Safe Uninstaller
+echo   Vercel CLI - 안전 제거 / Safe Uninstaller
 echo ============================================================
 echo.
 
-REM === Check if installed ===
+REM === 설치 확인 / Check if installed ===
 set "VERCEL_VER="
 where vercel >nul 2>&1
 if !ERRORLEVEL! NEQ 0 goto :NOT_FOUND
 
 for /f "tokens=*" %%v in ('vercel --version 2^>nul') do set "VERCEL_VER=%%v"
-echo   Found: Vercel CLI !VERCEL_VER!
+echo   찾음 / Found: Vercel CLI !VERCEL_VER!
 echo.
-echo   This will remove:
-echo     1. Vercel CLI (npm global package)
-echo     2. Vercel config folder  (~/.vercel)
-echo     3. Local .vercel folder  (in this folder only)
+echo   이것들을 지웁니다 / This will remove:
+echo     1. Vercel CLI (npm 전역 패키지 / global package)
+echo     2. Vercel 설정 폴더 / config folder  (~/.vercel)
+echo     3. 이 폴더의 .vercel / local .vercel (in this folder only)
 echo.
-echo   WARNING: This cannot be undone!
+echo   [주의 Warning] 되돌릴 수 없습니다 / This cannot be undone!
+echo   (내가 만든 코드/파일은 안전합니다 / Your own files are safe.)
 echo.
 
 set "CONFIRM="
-set /p "CONFIRM=   Type YES to uninstall: "
+set /p "CONFIRM=   제거하려면 YES 입력 (대소문자 무관) / Type YES to uninstall: "
 if /i "!CONFIRM!" NEQ "YES" goto :CANCELLED
 
 echo.
 
 REM ================================================================
-REM   STEP 1/4  Logout first (ignore errors if not logged in)
+REM   1/4  로그아웃 / Logout first (오류 무시 / ignore errors)
 REM ================================================================
-echo [Step 1/4] Logging out ...
+echo [1/4] 로그아웃 / Logging out ...
 call vercel logout >nul 2>&1
-echo           Done
+echo        완료 / Done
 
 REM ================================================================
-REM   STEP 2/4  Uninstall npm package
+REM   2/4  패키지 제거 / Uninstall npm package
 REM ================================================================
 echo.
-echo [Step 2/4] Removing Vercel CLI package ...
-echo           Running: npm uninstall -g vercel
+echo [2/4] Vercel CLI 제거 중 / Removing Vercel CLI package ...
+echo        실행 / Running: npm uninstall -g vercel
 echo.
 
 call npm uninstall -g vercel
 if !ERRORLEVEL! NEQ 0 goto :ERR_UNINSTALL
 
 echo.
-echo           Package removed [OK]
+echo        패키지 제거됨 / Package removed [OK]
 
 REM ================================================================
-REM   STEP 3/4  Remove global config (~/.vercel)
+REM   3/4  전역 설정 제거 / Remove global config (~/.vercel)
 REM ================================================================
 echo.
-echo [Step 3/4] Removing Vercel config folder ...
+echo [3/4] Vercel 설정 폴더 제거 / Removing config folder ...
 
 set "VERCEL_CFG=%USERPROFILE%\.vercel"
 
 if not exist "!VERCEL_CFG!" goto :NO_GLOBAL_CFG
 
-echo           Found: !VERCEL_CFG!
+echo        찾음 / Found: !VERCEL_CFG!
 echo.
 
-set "DEL_CFG="
-set /p "DEL_CFG=           Delete config folder? [Y/N]: "
-if /i "!DEL_CFG!" NEQ "Y" goto :SKIP_GLOBAL_CFG
+echo        설정 폴더도 삭제할까요? / Delete config folder too?
+echo        - 5초 안에 [N] 을 누르면 남겨둡니다.
+echo        - 그냥 두면 5초 뒤 깨끗이 삭제합니다.
+echo          (Press [N] within 5s to keep; otherwise it is removed.)
+choice /c YN /n /t 5 /d Y >nul
+if errorlevel 2 goto :SKIP_GLOBAL_CFG
 
 rmdir /s /q "!VERCEL_CFG!" 2>nul
-echo           Removed !VERCEL_CFG! [OK]
+echo        삭제됨 / Removed !VERCEL_CFG! [OK]
 goto :STEP4
 
 :NO_GLOBAL_CFG
-echo           No config folder found [SKIP]
+echo        설정 폴더 없음 / No config folder found [SKIP]
 goto :STEP4
 
 :SKIP_GLOBAL_CFG
-echo           Keeping config folder [SKIP]
+echo        설정 폴더 유지 / Keeping config folder [SKIP]
 
 REM ================================================================
-REM   STEP 4/4  Remove local .vercel folder
+REM   4/4  이 폴더의 .vercel 제거 / Remove local .vercel folder
 REM ================================================================
 :STEP4
 echo.
-echo [Step 4/4] Removing local .vercel folder ...
+echo [4/4] 이 폴더의 .vercel 제거 / Removing local .vercel folder ...
 
 if not exist "%SCRIPT_DIR%\.vercel" goto :NO_LOCAL_CFG
 
-echo           Found: %SCRIPT_DIR%\.vercel
+echo        찾음 / Found: %SCRIPT_DIR%\.vercel
 echo.
 
-set "DEL_LOCAL="
-set /p "DEL_LOCAL=           Delete local .vercel folder? [Y/N]: "
-if /i "!DEL_LOCAL!" NEQ "Y" goto :SKIP_LOCAL_CFG
+echo        이 폴더의 .vercel 도 삭제할까요? / Delete local .vercel too?
+echo        - 5초 안에 [N] 을 누르면 남겨둡니다.
+echo        - 그냥 두면 5초 뒤 삭제합니다.
+echo          (Press [N] within 5s to keep; otherwise it is removed.)
+choice /c YN /n /t 5 /d Y >nul
+if errorlevel 2 goto :SKIP_LOCAL_CFG
 
 rmdir /s /q "%SCRIPT_DIR%\.vercel" 2>nul
-echo           Removed [OK]
+echo        삭제됨 / Removed [OK]
 goto :UNINSTALL_DONE
 
 :NO_LOCAL_CFG
-echo           No local .vercel folder found [SKIP]
+echo        없음 / No local .vercel folder found [SKIP]
 goto :UNINSTALL_DONE
 
 :SKIP_LOCAL_CFG
-echo           Keeping local .vercel folder [SKIP]
+echo        유지 / Keeping local .vercel folder [SKIP]
 
 :UNINSTALL_DONE
 echo.
 echo ============================================================
-echo   UNINSTALL COMPLETE
+echo   제거 완료 / UNINSTALL COMPLETE
 echo ============================================================
 echo.
-echo   Vercel CLI has been removed.
-echo   To install again, run INSTALL.bat.
+echo   Vercel CLI 가 제거되었습니다 / Vercel CLI has been removed.
+echo   다시 설치하려면 INSTALL.bat / To install again, run INSTALL.bat.
 echo.
 pause
 endlocal
@@ -137,9 +146,10 @@ exit /b 0
 
 
 REM ================================================================
-REM   ERROR / CANCEL HANDLERS
+REM   오류 / 취소 처리 / ERROR / CANCEL HANDLERS
 REM ================================================================
 :NOT_FOUND
+echo   Vercel CLI 가 설치되어 있지 않습니다. 지울 것이 없습니다.
 echo   Vercel CLI is not installed. Nothing to remove.
 echo.
 pause
@@ -148,6 +158,7 @@ exit /b 0
 
 :CANCELLED
 echo.
+echo   제거를 취소했습니다. 아무것도 바뀌지 않았습니다.
 echo   Uninstall cancelled. Nothing was changed.
 echo.
 pause
@@ -156,9 +167,9 @@ exit /b 0
 
 :ERR_UNINSTALL
 echo.
-echo   [ERROR] npm uninstall -g vercel failed!
-echo.
-echo   Try: Right-click UNINSTALL.bat and pick 'Run as Administrator'
+echo   [문제 Problem] npm uninstall -g vercel 실패 / failed!
+echo   (드물게 권한 오류면, 그때만 우클릭 -^> 관리자 권한으로 실행)
+echo   (Only if a rare permission error: right-click -^> Run as administrator)
 echo.
 pause
 endlocal
