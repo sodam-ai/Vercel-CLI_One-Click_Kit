@@ -1,0 +1,30 @@
+Vercel CLI One-Click Kit
+Copyright 2026 SoDam AI Studio
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+------------------------------------------------------------------------
+Third-party tools this kit helps you install / use
+------------------------------------------------------------------------
+
+Vercel CLI (vercel)
+  Copyright Vercel, Inc.
+  Licensed under the Apache License, Version 2.0
+  https://github.com/vercel/vercel
+
+Node.js
+  A trademark of the OpenJS Foundation
+  https://nodejs.org/
+
+------------------------------------------------------------------------
+Notes
+------------------------------------------------------------------------
+
+This kit is an independent helper. It is NOT affiliated with, endorsed by,
+or sponsored by Vercel, Inc. or the OpenJS Foundation.
+
+"Vercel" is a trademark of Vercel, Inc.
+
+This kit installs Vercel's "vercel" CLI from the public npm registry.
+Your use of Vercel is subject to Vercel's terms and pricing.
