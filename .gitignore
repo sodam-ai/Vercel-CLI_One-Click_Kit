@@ -1,21 +1,26 @@
-# Vercel local config (created when you link a project)
-.vercel/
+# 백업 파일 (로컬 롤백용 - 공개 저장소에는 올리지 않음)
+*.bak
+_bak/
 
-# Environment variable files (may contain API keys)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env*.local
+# 임시/로그
+*.tmp
+*.log
 
-# OS files
+# 패키지/압축 산출물 (저장소에 올리지 않음)
+*.7z
+*.zip
+*.rar
+
+# 내부 테스트 문서 (공개 X)
+검증체크리스트.md
+
+# OS 잡파일
 Thumbs.db
-Desktop.ini
+desktop.ini
 .DS_Store
 
-# Editor
-.vscode/
-.idea/
-*.suo
-*.user
+# 민감 파일 (혹시라도 생기면 절대 커밋 금지)
+.env
+.env.*
+.vercel/
+**/auth.json

@@ -1,0 +1,7 @@
+# 인코딩/줄바꿈 고정 - git이 .bat/.ps1 을 건드려 깨지지 않게 함
+# .bat = CP949(한글) + CRLF (cmd는 CRLF 필요). 변환 금지.
+*.bat -text
+# .ps1 = UTF-8(BOM) + CRLF. 한글 보존. 변환 금지.
+*.ps1 -text
+# 문서 PDF = 바이너리.
+*.pdf binary
